@@ -1,0 +1,53 @@
+@startuml
+actor User
+entity Portal
+database Index
+database Storage
+box Internal Net
+boundary MDS as "Metadata REST API"
+end box
+
+group User searches for content
+
+    User->Portal : Search for a term
+    Portal->Index : Query published html content index
+    Index->Portal : Matching content
+    Portal->User : Display Search Results Grid
+
+    User->Portal: Click on grid row
+    Portal->Storage: Retrieve content package [Content UID]
+    Storage<-Portal: Content Package (see data model)
+    Portal->User: Display content page and summary metadata
+end
+
+group User views content history
+
+    User->Portal: Click version history for content page
+    Portal->Storage: Retrieve version history
+    Storage->Portal: Version History JSON
+    Portal->User: Display Version History table
+    ...
+    ...
+    User->Portal: Click on earlier revision
+    Portal->MDS: Retrieve earlier Content Package [UID & Ver#]
+    MDS->Portal: Return earlier revision Content Package
+    Portal->User: Display earlier revision content HTML & summary metadata
+
+end
+
+group historic content relationships
+    ...
+    ...
+    User->Portal: Click earlier revision's relationships
+    Portal->MDS: Retrieve relationships for earlier revision
+    Portal<-MDS: Return relationships for earlier revision
+    Portal->User: Display relationships for earlier revision
+    ...
+    ...
+    User->Portal: Click related asset with an earlier revision than current
+    Portal->MDS: Retrieve related asset earlier version
+    MDS->Portal: Return related asset earlier version package
+    Portal->User: Portal displays related asset content and summary metadata
+end
+
+@enduml
